@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+
+<!--
+/**
+ * Create a log
+ *
+ * @copyright Copyright (C) 2009 SiCo
+ * @package sico_log
+ */
+-->
+
+<extension engine="1.0">
+	<id>sico_log</id>
+	<title>User Log</title>
+	<version>0.0.2</version>
+	<description>Allows moderators to create log entries on a users account.</description>
+	<author>Simon Corless</author>
+	<minversion>1.3</minversion>
+	<maxtestedon>1.3.2</maxtestedon>
+
+	<note type="uninstall" timing="pre">WARNING! All users' log entries will be removed during the uninstall process. It is strongly recommended you disable 'User Log' extension instead or  upgrade it without uninstalling.</note>
+
+	<install><![CDATA[
+
+	]]></install>
+
+	<uninstall><![CDATA[
+
+	]]></uninstall>
+
+	<hooks>
+
+		<hook id="pf_change_details_about_pre_user_private_info"><![CDATA[
+
+		// Include the language file
+		if (file_exists($ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php'))
+			include_once $ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php';
+		else
+			include_once $ext_info['path'].'/lang/English/'.$ext_info['id'].'.php';
+		
+		// Include the extension functions
+		include_once $ext_info['path'].'/functions.php';
+		
+		// Is the user an admin or a moderator
+		if ($forum_user['is_admmod']) {
+			
+			// Setup the log message
+			//$forum_page['user_sico_log']['log'][] = '<li><span>Test Log Message</span></li>';
+			
+			// Retrieve the users latest log entry if there is one
+			$message = sico_user_log_recent();
+			
+			$forum_page['user_sico_log']['log'] = '<p>' . $message['log_text'] . '</p><p>' . format_time($message['log_created'], 0) . '</p>';
+			
+			// Display the log message
+			if (!empty($forum_page['user_sico_log'])): ?>
+			<div id="private-profile" class="ct-set data-set set<?php echo ++$forum_page['item_count'] ?>">
+				<div class="ct-box data-box">
+					<h3 class="ct-legend hn"><span><?php echo $lang_sico_user_log['SiCo Log'] ?></span></h3>
+					<ul class="data-list">
+						<?php echo implode("\n\t\t\t\t\t\t", $forum_page['user_sico_log'])."\n" ?>
+					</ul>
+				</div>
+			</div>
+			<?php endif;
+			
+		}
+		
+		]]></hook>
+
+	</hooks>
+
+</extension>
